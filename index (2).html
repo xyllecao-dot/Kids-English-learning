@@ -1,0 +1,468 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@600;700&display=swap');
+
+body {
+  font-family: 'Quicksand', 'Comic Sans MS', sans-serif;
+  background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb);
+  background-size: 400% 400%;
+  animation: gradientBG 12s ease infinite;
+  color: #2f3542;
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.app-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 8px solid #ff758f;
+  border-radius: 40px;
+  width: 100%;
+  max-width: 700px;
+  padding: 35px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  text-align: center;
+  position: relative;
+}
+
+h1 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 2.5rem;
+  color: #ff4757;
+  margin-top: 0;
+  text-shadow: 3px 3px 0px #ffeaa7;
+}
+
+p { font-size: 1.2rem; line-height: 1.6; }
+
+/* Form Elements */
+input[type="text"] {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  padding: 14px 22px;
+  border: 4px solid #70a1ff;
+  border-radius: 30px;
+  width: 75%;
+  text-align: center;
+  margin-bottom: 20px;
+  outline: none;
+  box-shadow: 0 5px 15px rgba(112, 161, 255, 0.3);
+}
+
+.btn {
+  font-family: 'Fredoka One', cursive;
+  background: linear-gradient(45deg, #ff6b81, #ff4757);
+  color: white;
+  border: 3px solid #ffffff;
+  padding: 14px 30px;
+  font-size: 1.2rem;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(255, 71, 87, 0.4);
+  transition: transform 0.2s;
+  margin: 8px;
+}
+
+.btn:hover { transform: scale(1.08); }
+
+/* Book View */
+.book-cover {
+  background: #fff9e6;
+  border: 5px dashed #ffa502;
+  padding: 25px;
+  border-radius: 30px;
+  margin: 20px 0;
+  box-shadow: inset 0 0 15px rgba(255, 165, 0, 0.1);
+}
+
+.story-emoji {
+  font-size: 4.5rem;
+  margin-bottom: 10px;
+  animation: bounce 2s infinite ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.story-text {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2f3542;
+  text-align: left;
+  background: #ffffff;
+  border: 3px solid #70a1ff;
+  padding: 22px;
+  border-radius: 25px;
+  line-height: 1.9;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+/* Quiz Task Options */
+.quiz-option {
+  display: block;
+  width: 100%;
+  background: linear-gradient(45deg, #f7b731, #ffa502);
+  color: white;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem;
+  padding: 12px;
+  margin: 10px 0;
+  border: 3px solid white;
+  border-radius: 25px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(255, 165, 0, 0.3);
+  transition: transform 0.2s;
+}
+
+.quiz-option:hover { transform: scale(1.03); background: #ff7f50; }
+
+.feedback-msg {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  margin-top: 15px;
+  min-height: 40px;
+}
+
+.correct { color: #2ed573; text-shadow: 1px 1px 0px #ffffff; }
+.wrong { color: #ff4757; text-shadow: 1px 1px 0px #ffffff; }
+
+/* Progress Header */
+.user-bar {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #57606f;
+  border-bottom: 3px dashed #ff758f;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+</style>
+
+<div class="app-card" id="app">
+  <!-- Dynamic content will be injected here by JavaScript -->
+</div>
+
+<script>
+let userName = "";
+let currentStoryIndex = 0;
+let currentQuestionIndex = 0;
+let userScore = 0;
+
+// 10 Animal Stories (5-Sentence Paragraphs) + 10 Quiz Questions Each
+const stories = [
+  {
+    title: "The Friendly Bear 🐻",
+    emoji: "🐻",
+    paragraph: "Barnaby is a friendly brown bear who makes his home deep inside a cozy green forest. Every morning, he searches for his favorite snack, which is sweet and delicious honey. Because he is so kind, he always shares his food with all of his animal friends. They enjoy spending time together, and everyone in the forest loves Barnaby very much.",
+    questions: [
+      { q: "1. What kind of animal is Barnaby?", opts: ["A cat", "A bear", "A dog"], ans: 1 },
+      { q: "2. What color is Barnaby?", opts: ["Brown", "White", "Black"], ans: 0 },
+      { q: "3. Where does Barnaby live?", opts: ["In the city", "In a cozy forest", "In the ocean"], ans: 1 },
+      { q: "4. What time does he search for food?", opts: ["Every morning", "At night", "In the evening"], ans: 0 },
+      { q: "5. What is his favorite snack?", opts: ["Sweet honey", "Fresh fish", "Green grass"], ans: 0 },
+      { q: "6. How does the honey taste?", opts: ["Sour", "Salty", "Sweet and delicious"], ans: 2 },
+      { q: "7. Why does Barnaby share his food?", opts: ["Because he is kind", "Because he is sad", "Because he is scared"], ans: 0 },
+      { q: "8. Who does Barnaby share his food with?", opts: ["No one", "His animal friends", "Bears only"], ans: 1 },
+      { q: "9. What do they enjoy doing together?", opts: ["Spending time", "Fighting", "Sleeping all day"], ans: 0 },
+      { q: "10. How do the forest animals feel about Barnaby?", opts: ["They dislike him", "They love him very much", "They ignore him"], ans: 1 }
+    ]
+  },
+  {
+    title: "The Playful Kitten 🐱",
+    emoji: "🐱",
+    paragraph: "Cleo is a tiny white cat with soft fur. She likes to chase bright red yarn around the living room. Every morning, she drinks a small bowl of fresh milk. Later in the afternoon, she naps comfortably under the warm sun. Cleo purrs softly whenever you pet her back.",
+    questions: [
+      { q: "1. What is the cat's name?", opts: ["Cleo", "Bella", "Luna"], ans: 0 },
+      { q: "2. What size is Cleo?", opts: ["Giant", "Tiny", "Huge"], ans: 1 },
+      { q: "3. What color is her fur?", opts: ["Black", "White", "Brown"], ans: 1 },
+      { q: "4. What does she like to chase?", opts: ["Bright red yarn", "Mice", "Birds"], ans: 0 },
+      { q: "5. Where does she chase the yarn?", opts: ["In the garden", "Around the living room", "On the roof"], ans: 1 },
+      { q: "6. What does she drink every morning?", opts: ["Water", "Fresh milk", "Juice"], ans: 1 },
+      { q: "7. How much milk does she drink?", opts: ["A giant bucket", "A small bowl", "A big glass"], ans: 1 },
+      { q: "8. When does she nap?", opts: ["At night", "Later in the afternoon", "Early morning"], ans: 1 },
+      { q: "9. Where does she nap?", opts: ["Under the warm sun", "In a box", "Under the bed"], ans: 0 },
+      { q: "10. What sound does Cleo make when petted?", opts: ["She barks", "She purrs softly", "She roars"], ans: 1 }
+    ]
+  },
+  {
+    title: "The Helpful Elephant 🐘",
+    emoji: "🐘",
+    paragraph: "Ella is a very tall elephant with a big warm heart. She has large round ears that flap gently in the breeze. Whenever it is hot, she uses her long trunk to spray cool water. She loves helping wash her animal friends so they stay clean. Ella is always kind, happy, and ready to lend a helping hand.",
+    questions: [
+      { q: "1. What animal is Ella?", opts: ["A giraffe", "An elephant", "A hippo"], ans: 1 },
+      { q: "2. Is Ella short or tall?", opts: ["Very tall", "Very short", "Medium"], ans: 0 },
+      { q: "3. What shape are her ears?", opts: ["Tiny and sharp", "Large and round", "Long and pointed"], ans: 1 },
+      { q: "4. How do her ears move?", opts: ["They flap gently", "They do not move", "They spin"], ans: 0 },
+      { q: "5. When does she spray water?", opts: ["When it rains", "Whenever it is hot", "At bedtime"], ans: 1 },
+      { q: "6. What does she use to spray water?", opts: ["Her tail", "Her long trunk", "Her feet"], ans: 1 },
+      { q: "7. What kind of water does she spray?", opts: ["Hot water", "Cool water", "Dirty water"], ans: 1 },
+      { q: "8. Why does she wash her animal friends?", opts: ["So they stay clean", "To make them muddy", "For fun only"], ans: 0 },
+      { q: "9. How does Ella feel about helping?", opts: ["She gets angry", "She loves helping", "She complains"], ans: 1 },
+      { q: "10. What words describe Ella?", opts: ["Mean and loud", "Kind, happy, and helpful", "Shy and quiet"], ans: 1 }
+    ]
+  },
+  {
+    title: "The Fast Rabbit 🐰",
+    emoji: "🐰",
+    paragraph: "Robbie is a little white rabbit with fluffy ears. He can hop very high over tall green grass. Every day, he loves eating crunchy carrots for lunch. At night, he sleeps safely inside a small cozy hole. Robbie is known as the fastest runner in the entire meadow.",
+    questions: [
+      { q: "1. What is the rabbit's name?", opts: ["Robbie", "Ricky", "Ronny"], ans: 0 },
+      { q: "2. What color is Robbie?", opts: ["Grey", "White", "Brown"], ans: 1 },
+      { q: "3. What kind of ears does Robbie have?", opts: ["Fluffy ears", "Short ears", "No ears"], ans: 0 },
+      { q: "4. How high can Robbie hop?", opts: ["Very high", "He cannot hop", "Very low"], ans: 0 },
+      { q: "5. What does Robbie hop over?", opts: ["Tall green grass", "Fences", "Rocks"], ans: 0 },
+      { q: "6. What does he eat for lunch?", opts: ["Crunchy carrots", "Green apples", "Corn"], ans: 0 },
+      { q: "7. When does he eat his carrots?", opts: ["For breakfast", "For lunch", "At midnight"], ans: 1 },
+      { q: "8. Where does Robbie sleep at night?", opts: ["In a tree", "Inside a small cozy hole", "On a bench"], ans: 1 },
+      { q: "9. How does he sleep in his hole?", opts: ["Safely", "Scared", "Cold"], ans: 0 },
+      { q: "10. What is Robbie famous for in the meadow?", opts: ["Being the loudest", "Being the fastest runner", "Being sleepy"], ans: 1 }
+    ]
+  },
+  {
+    title: "The Clever Monkey 🐒",
+    emoji: "🐒",
+    paragraph: "Milo is a funny brown monkey who loves to play. He spends his days swinging happily from tall tree branches. Yummy yellow bananas are his absolute favorite snack. He often makes silly faces to make the birds laugh. Milo brings joy and smiles to everyone in the jungle.",
+    questions: [
+      { q: "1. What kind of animal is Milo?", opts: ["A tiger", "A monkey", "A bear"], ans: 1 },
+      { q: "2. What adjective describes Milo?", opts: ["Funny", "Sad", "Grumpy"], ans: 0 },
+      { q: "3. How does Milo swing from tree branches?", opts: ["Happily", "Slowly", "Scared"], ans: 0 },
+      { q: "4. What kind of tree branches does he swing on?", opts: ["Tall tree branches", "Low bushes", "Fallen logs"], ans: 0 },
+      { q: "5. What is his favorite snack?", opts: ["Yummy yellow bananas", "Peanuts", "Mangos"], ans: 0 },
+      { q: "6. What color are his favorite bananas?", opts: ["Green", "Yellow", "Red"], ans: 1 },
+      { q: "7. Who does Milo make laugh?", opts: ["The birds", "The lions", "The fish"], ans: 0 },
+      { q: "8. How does he make the birds laugh?", opts: ["By making silly faces", "By singing", "By dancing"], ans: 0 },
+      { q: "9. Where does Milo live?", opts: ["In the jungle", "In the desert", "On a farm"], ans: 0 },
+      { q: "10. What does Milo bring to everyone?", opts: ["Joy and smiles", "Bananas", "Noise"], ans: 0 }
+    ]
+  },
+  {
+    title: "The Proud Lion 🦁",
+    emoji: "🦁",
+    paragraph: "Leo is a brave young lion who rules the grasslands. He has a golden fluffy mane that shines in the light. When he practices his loud roar, all the animals listen. He carefully watches over his family to keep them safe. Everyone respects Leo because he is a fair king.",
+    questions: [
+      { q: "1. What is the lion's name?", opts: ["Leo", "Luke", "Liam"], ans: 0 },
+      { q: "2. What words describe Leo?", opts: ["Brave young lion", "Old quiet lion", "Small weak lion"], ans: 0 },
+      { q: "3. Where does Leo rule?", opts: ["The grasslands", "The mountains", "The ocean"], ans: 0 },
+      { q: "4. What does Leo have around his neck?", opts: ["A golden fluffy mane", "A collar", "A scarf"], ans: 0 },
+      { q: "5. What happens to his mane in the light?", opts: ["It shines", "It changes color", "It falls off"], ans: 0 },
+      { q: "6. What does Leo practice doing?", opts: ["His loud roar", "Jumping high", "Running fast"], ans: 0 },
+      { q: "7. What do the animals do when Leo roars?", opts: ["They all listen", "They run away", "They laugh"], ans: 0 },
+      { q: "8. Why does Leo watch over his family?", opts: ["To keep them safe", "To play games", "To feed them"], ans: 0 },
+      { q: "9. Why does everyone respect Leo?", opts: ["Because he is a fair king", "Because he is scary", "Because he is loud"], ans: 0 },
+      { q: "10. What role does Leo have in the grasslands?", opts: ["The king", "A guard", "A helper"], ans: 0 }
+    ]
+  },
+  {
+    title: "The Gentle Giraffe 🦒",
+    emoji: "🦒",
+    paragraph: "Gina is a gentle giraffe with a very long neck. She reaches high into tall trees to eat fresh leaves. Her coat is decorated with pretty brown spots all over. She walks softly across the grass without making a sound. Gina always smiles kindly at the passing clouds.",
+    questions: [
+      { q: "1. What animal is Gina?", opts: ["A zebra", "A giraffe", "A camel"], ans: 1 },
+      { q: "2. What feature is special about Gina's neck?", opts: ["It is very long", "It is short", "It is blue"], ans: 0 },
+      { q: "3. Where does Gina reach to find food?", opts: ["High into tall trees", "Under rocks", "On the ground"], ans: 0 },
+      { q: "4. What does she eat from the trees?", opts: ["Fresh leaves", "Fruit", "Bark"], ans: 0 },
+      { q: "5. What decorates Gina's coat?", opts: ["Pretty brown spots", "Black stripes", "Stars"], ans: 0 },
+      { q: "6. How does Gina walk across the grass?", opts: ["Softly", "Loudly", "Fast"], ans: 0 },
+      { q: "7. Does Gina make noise when she walks?", opts: ["No, without making a sound", "Yes, a lot", "Sometimes"], ans: 0 },
+      { q: "8. How does Gina look at the clouds?", opts: ["She smiles kindly", "She frowns", "She cries"], ans: 0 },
+      { q: "9. What moves past Gina in the sky?", opts: ["Passing clouds", "Airplanes", "Kites"], ans: 0 },
+      { q: "10. What kind of nature does Gina have?", opts: ["Gentle", "Wild", "Angry"], ans: 0 }
+    ]
+  },
+  {
+    title: "The Happy Dolphin 🐬",
+    emoji: "🐬",
+    paragraph: "Danny is a bright blue dolphin who loves the sea. He swims super fast through the ocean waves. Sometimes, he leaps high into the air and splashes back down. Danny plays fun games with small silver fish every afternoon. He makes cheerful clicking sounds to say hello.",
+    questions: [
+      { q: "1. What kind of animal is Danny?", opts: ["A whale", "A dolphin", "A shark"], ans: 1 },
+      { q: "2. What color is Danny?", opts: ["Bright blue", "Grey", "Green"], ans: 0 },
+      { q: "3. What place does Danny love?", opts: ["The sea", "The river", "The park"], ans: 0 },
+      { q: "4. How fast does Danny swim?", opts: ["Super fast", "Very slow", "Medium speed"], ans: 0 },
+      { q: "5. What does Danny swim through?", opts: ["Ocean waves", "Lakes", "Pools"], ans: 0 },
+      { q: "6. What does Danny do high in the air?", opts: ["He leaps", "He flies", "He floats"], ans: 0 },
+      { q: "7. What happens after he leaps into the air?", opts: ["He splashes back down", "He disappears", "He sleeps"], ans: 0 },
+      { q: "8. Who does Danny play games with?", opts: ["Small silver fish", "Turtles", "Seals"], ans: 0 },
+      { q: "9. When does Danny play with his friends?", opts: ["Every afternoon", "At night", "In the morning"], ans: 0 },
+      { q: "10. How does Danny say hello?", opts: ["With cheerful clicking sounds", "By whistling", "By waving"], ans: 0 }
+    ]
+  },
+  {
+    title: "The Wise Owl 🦉",
+    emoji: "🦉",
+    paragraph: "Oliver is a wise old owl who lives in a big oak tree. He stays awake all night long while others sleep. He sits quietly on a thick branch and guards the forest. His big round eyes can see everything clearly in the dark. Oliver calls out a friendly hoo-hoo sound to his neighbors.",
+    questions: [
+      { q: "1. What is the owl's name?", opts: ["Oliver", "Oscar", "Otis"], ans: 0 },
+      { q: "2. What adjective describes Oliver?", opts: ["Wise old", "Young silly", "Loud new"], ans: 0 },
+      { q: "3. Where does Oliver live?", opts: ["In a big oak tree", "In a barn", "In a cave"], ans: 0 },
+      { q: "4. When does Oliver stay awake?", opts: ["All night long", "During the day", "At noon"], ans: 0 },
+      { q: "5. What are other animals doing while Oliver is awake?", opts: ["Sleeping", "Playing", "Eating"], ans: 0 },
+      { q: "6. Where does Oliver sit in the tree?", opts: ["On a thick branch", "On top of leaves", "In the trunk"], ans: 0 },
+      { q: "7. What job does Oliver do for the forest?", opts: ["He guards the forest", "He gathers food", "He cleans"], ans: 0 },
+      { q: "8. How do Oliver's eyes see in the dark?", opts: ["Clearly", "Poorly", "Not at all"], ans: 0 },
+      { q: "9. What shape are his eyes?", opts: ["Big round eyes", "Small square eyes", "Tiny eyes"], ans: 0 },
+      { q: "10. What friendly sound does Oliver call out?", opts: ["Hoo-hoo", "Tweet-tweet", "Quack-quack"], ans: 0 }
+    ]
+  },
+  {
+    title: "The Cute Puppy 🐶",
+    emoji: "🐶",
+    paragraph: "Pepper is a sweet brown puppy with a playful heart. He wags his tail excitedly whenever he feels happy. He loves running around the yard playing with a red ball. Pepper always guards the front porch with lots of energy. He is a wonderful companion and a child's best friend.",
+    questions: [
+      { q: "1. What is the puppy's name?", opts: ["Pepper", "Peanut", "Penny"], ans: 0 },
+      { q: "2. What color is Pepper?", opts: ["Brown", "Black", "Spotted"], ans: 0 },
+      { q: "3. What kind of heart does Pepper have?", opts: ["A playful heart", "A sad heart", "A lazy heart"], ans: 0 },
+      { q: "4. How does Pepper move his tail when happy?", opts: ["He wags it excitedly", "He keeps it still", "He hides it"], ans: 0 },
+      { q: "5. Where does Pepper love running around?", opts: ["Around the yard", "Inside the kitchen", "On the street"], ans: 0 },
+      { q: "6. What toy does Pepper play with?", opts: ["A red ball", "A stick", "A shoe"], ans: 0 },
+      { q: "7. What place does Pepper guard?", opts: ["The front porch", "The bedroom", "The fence"], ans: 0 },
+      { q: "8. How much energy does Pepper have when guarding?", opts: ["Lots of energy", "No energy", "A little energy"], ans: 0 },
+      { q: "9. What kind of companion is Pepper?", opts: ["A wonderful companion", "A noisy pet", "A wild animal"], ans: 0 },
+      { q: "10. Who is Pepper a best friend to?", opts: ["A child", "A cat", "Another puppy"], ans: 0 }
+    ]
+  }
+];
+
+// Screen 1: Login
+function renderLogin() {
+  document.getElementById('app').innerHTML = `
+    <h1>📖 Kids English World 🌟</h1>
+    <p>Welcome! Please enter your name to start learning:</p>
+    <input type="text" id="nameInput" placeholder="Enter your name..." />
+    <br>
+    <button class="btn" onclick="startApp()">Start Reading 🚀</button>
+  `;
+}
+
+function startApp() {
+  const input = document.getElementById('nameInput').value.trim();
+  if (!input) {
+    alert("Please enter your name!");
+    return;
+  }
+  userName = input;
+  currentStoryIndex = 0;
+  currentQuestionIndex = 0;
+  userScore = 0;
+  renderStory(currentStoryIndex);
+}
+
+// Screen 2: Read Story
+function renderStory(index) {
+  const story = stories[index];
+  document.getElementById('app').innerHTML = `
+    <div class="user-bar">
+      <span>👤 Reader: ${userName}</span>
+      <span>📚 Book ${index + 1} / 10</span>
+    </div>
+    <h1>${story.title}</h1>
+    <div class="book-cover">
+      <div class="story-emoji">${story.emoji}</div>
+      <div class="story-text">
+        ${story.paragraph}
+      </div>
+    </div>
+    <button class="btn" onclick="speakStory()">🔊 Listen / Read</button>
+    <button class="btn" style="background: linear-gradient(45deg, #2ed573, #1e90ff);" onclick="finishReading()">Start Task! ➡️</button>
+  `;
+}
+
+function speakStory() {
+  const text = stories[currentStoryIndex].paragraph;
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.85;
+    window.speechSynthesis.speak(utterance);
+  }
+}
+
+function finishReading() {
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  currentQuestionIndex = 0;
+  renderTask(currentStoryIndex, currentQuestionIndex);
+}
+
+// Screen 3: Quiz Tasks (10 Questions per Story)
+function renderTask(storyIdx, qIdx) {
+  const story = stories[storyIdx];
+  const qData = story.questions[qIdx];
+  let optionsHTML = "";
+  
+  qData.opts.forEach((opt, idx) => {
+    optionsHTML += `<button class="quiz-option" onclick="checkAnswer(${idx})">${opt}</button>`;
+  });
+
+  document.getElementById('app').innerHTML = `
+    <div class="user-bar">
+      <span>👤 ${userName}</span>
+      <span>📚 Book ${storyIdx + 1}/10</span>
+      <span>🎯 Q ${qIdx + 1}/10</span>
+    </div>
+    <h1>Task Time! 🧠</h1>
+    <p style="font-size: 1.35rem; font-weight: bold; color: #3742fa;">${qData.q}</p>
+    <div>${optionsHTML}</div>
+    <div class="feedback-msg" id="feedback"></div>
+    <button class="btn" id="nextBtn" style="display:none; background: linear-gradient(45deg, #2ed573, #10ac84);" onclick="nextQuestion()">Next Question ➡️</button>
+  `;
+}
+
+function checkAnswer(selectedIndex) {
+  const story = stories[currentStoryIndex];
+  const qData = story.questions[currentQuestionIndex];
+  const feedback = document.getElementById('feedback');
+  const nextBtn = document.getElementById('nextBtn');
+  
+  if (selectedIndex === qData.ans) {
+    feedback.className = "feedback-msg correct";
+    feedback.innerHTML = "🎉 Correct! Great job!";
+    userScore++;
+    nextBtn.style.display = "inline-block";
+  } else {
+    feedback.className = "feedback-msg wrong";
+    feedback.innerHTML = "❌ Try again!";
+  }
+}
+
+function nextQuestion() {
+  currentQuestionIndex++;
+  if (currentQuestionIndex < 10) {
+    renderTask(currentStoryIndex, currentQuestionIndex);
+  } else {
+    currentStoryIndex++;
+    if (currentStoryIndex < stories.length) {
+      renderStory(currentStoryIndex);
+    } else {
+      renderCertificate();
+    }
+  }
+}
+
+// Screen 4: Completion Certificate
+function renderCertificate() {
+  document.getElementById('app').innerHTML = `
+    <div style="font-size: 5rem;" class="story-emoji">🏆</div>
+    <h1>CONGRATULATIONS!</h1>
+    <h2>Awesome Job, ${userName}!</h2>
+    <p>You successfully read all 10 animal stories and finished all 100 tasks!</p>
+    <p style="font-size: 1.6rem; color: #2ed573; font-weight: bold;">
+      Final Score: ${userScore} / 100 Questions Completed!
+    </p>
+    <button class="btn" onclick="renderLogin()">Read Again 🔄</button>
+  `;
+}
+
+renderLogin();
+</script>
